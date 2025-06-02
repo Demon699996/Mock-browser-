@@ -1,0 +1,35 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Browser</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+  <header class="flex items-center bg-white border-b border-gray-100 px-4 py-2 space-x-3 fixed top-0 left-0 right-0 z-10">
+    <button aria-label="Close" class="w-3.5 h-3.5 rounded-full bg-red-500 hover:bg-red-600 focus:outline-none"></button>
+    <button aria-label="Minimize" class="w-3.5 h-3.5 rounded-full bg-yellow-400 hover:bg-yellow-500 focus:outline-none"></button>
+    <button aria-label="Maximize" class="w-3.5 h-3.5 rounded-full bg-green-500 hover:bg-green-600 focus:outline-none"></button>
+    <button aria-label="Back" class="ml-4 text-gray-400 hover:text-gray-600 focus:outline-none" disabled>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" >
+        <path d="M15 18l-6-6 6-6"></path>
+      </svg>
+    </button>
+    <button aria-label="Forward" class="text-gray-400 hover:text-gray-600 focus:outline-none" disabled>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" >
+        <path d="M9 18l6-6-6-6"></path>
+      </svg>
+    </button>
+    <input type="text" aria-label="URL bar" class="flex-grow bg-gray-100 rounded-md border border-gray-100 text-gray-500 text-sm px-3 py-1 ml-4 focus:outline-none" value="" placeholder="Powered by Mock"/>
+    <button aria-label="New tab" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" >
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+  </header>
+  
+  <main class="flex-grow bg-gray-100 border-t border-b border-gray-100 mt-[38px] mb-[38px]"></main>
+  <!-- <footer class="h-[38px] bg-gray-100 border-t border-gray-300 fixed bottom-0 left-0 right-0"></footer> -->
+</body>
+</html>

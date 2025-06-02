@@ -1,0 +1,164 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mock Beta</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col">
+  <header class="flex items-center bg-white border-b border-gray-100 px-4 py-2 space-x-3 fixed top-0 left-0 right-0 z-10">
+    <button aria-label="Close" class="w-3.5 h-3.5 rounded-full bg-red-500 hover:bg-red-600 focus:outline-none"></button>
+    <button aria-label="Minimize" class="w-3.5 h-3.5 rounded-full bg-yellow-400 hover:bg-yellow-500 focus:outline-none"></button>
+    <button aria-label="Maximize" class="w-3.5 h-3.5 rounded-full bg-green-500 hover:bg-green-600 focus:outline-none"></button>
+    <button 
+      id="backButton"
+      aria-label="Back" 
+      class="ml-4 text-gray-400 hover:text-gray-600 focus:outline-none" 
+      disabled
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" >
+        <path d="M15 18l-6-6 6-6"></path>
+      </svg>
+    </button>
+    <button 
+      id="forwardButton"
+      aria-label="Forward" 
+      class="text-gray-400 hover:text-gray-600 focus:outline-none" 
+      disabled
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" >
+        <path d="M9 18l6-6-6-6"></path>
+      </svg>
+    </button>
+    <input 
+      type="text" 
+      id="urlInput"
+      aria-label="URL bar" 
+      class="flex-grow bg-gray-100 rounded-md border border-gray-100 text-gray-500 text-sm px-3 py-1 ml-4 focus:outline-none" 
+      value="" 
+      placeholder="Powered by Mock"
+    />
+    <button 
+      id="newTabButton"
+      aria-label="New tab" 
+      class="text-gray-400 hover:text-gray-600 focus:outline-none"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" >
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+  </header>
+  
+  <main class="flex-grow bg-gray-100 border-t border-b border-gray-300 mt-[38px] mb-[38px]">
+    <iframe id="browserFrame" class="w-full h-full" frameborder="0"></iframe>
+  </main>
+  <!-- <footer class="h-[38px] bg-gray-100 border-t border-gray-300 fixed bottom-0 left-0 right-0">
+    
+  </footer> -->
+  <script>
+    // Browser history management
+    const history = {
+      urls: [],
+      currentIndex: -1,
+      
+      push(url) {
+        // Remove all forward history if we're not at the end
+        if (this.currentIndex < this.urls.length - 1) {
+          this.urls = this.urls.slice(0, this.currentIndex + 1);
+        }
+        
+        this.urls.push(url);
+        this.currentIndex = this.urls.length - 1;
+        this.updateButtons();
+      },
+      
+      back() {
+        if (this.currentIndex > 0) {
+          this.currentIndex--;
+          return this.urls[this.currentIndex];
+        }
+        return null;
+      },
+      
+      forward() {
+        if (this.currentIndex < this.urls.length - 1) {
+          this.currentIndex++;
+          return this.urls[this.currentIndex];
+        }
+        return null;
+      },
+      
+      updateButtons() {
+        document.getElementById('backButton').disabled = this.currentIndex <= 0;
+        document.getElementById('forwardButton').disabled = this.currentIndex >= this.urls.length - 1;
+      }
+    };
+
+    // Get DOM elements
+    const urlInput = document.getElementById('urlInput');
+    const browserFrame = document.getElementById('browserFrame');
+    const backButton = document.getElementById('backButton');
+    const forwardButton = document.getElementById('forwardButton');
+    const newTabButton = document.getElementById('newTabButton');
+
+    // Handle URL input
+    urlInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        let url = this.value.trim();
+        
+        // Add https:// if not present
+        if (url && !url.match(/^https?:\/\//)) {
+          url = 'https://' + url;
+        }
+        
+        if (url) {
+          try {
+            browserFrame.src = url;
+            history.push(url);
+            urlInput.value = url;
+          } catch (error) {
+            console.error('Error loading URL:', error);
+          }
+        }
+      }
+    });
+
+    // Handle back button
+    backButton.addEventListener('click', function() {
+      const url = history.back();
+      if (url) {
+        browserFrame.src = url;
+        urlInput.value = url;
+      }
+    });
+
+    // Handle forward button
+    forwardButton.addEventListener('click', function() {
+      const url = history.forward();
+      if (url) {
+        browserFrame.src = url;
+        urlInput.value = url;
+      }
+    });
+
+    // Handle new tab button (opens blank page)
+    newTabButton.addEventListener('click', function() {
+      browserFrame.src = '';
+      urlInput.value = '';
+      history.push('about:blank');
+    });
+
+    // Update frame URL when navigation happens within iframe
+    browserFrame.addEventListener('load', function() {
+      try {
+        // This will fail due to cross-origin restrictions, but we try anyway
+        const frameUrl = browserFrame.contentWindow.location.href;
+        urlInput.value = frameUrl;
+      } catch (e) {
+        // Just ignore the error - we can't access the URL due to security restrictions
+      }
+    });
+  </script>
+</body>
+</html>
