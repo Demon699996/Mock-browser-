@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Viewer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #232323;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .search-bar {
+            width: 90%;
+            max-width: 600px;
+            margin: 15px auto 0;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 45px 10px 45px;
+            border: 1px solid #3B3B3B;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+            background-color: #3B3B3B;
+            color: rgba(177, 174, 174, 1);
+            font-weight: 500;
+            caret-color: rgba(200, 200, 200, 1);
+        }
+        
+        .search-input:focus {
+            border-color: #3a3f46;
+            box-shadow: 0 0 9px rgba(109, 109, 109, 1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 52%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+        
+        .search-icon1 {
+            position: absolute;
+            right: 15px;
+            top: 52%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+        
+        .iframe-container {
+            flex: 1;
+            width: 100%;
+            background-color: #232323;
+            position: relative;
+        }
+        
+        #website-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: white;
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            padding: 20px;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-bar">
+        <i class="search-icon fas fa-search"></i>
+        <input type="text" class="search-input" id="url-input" placeholder="Powered by Mock" autocomplete="off">
+        <i class="search-icon1 fa-brands fa-wirsindhandwerk"></i>
+    </div>
+    
+    <div class="iframe-container">
+        <div class="error-message" id="error-message"></div>
+        <iframe id="website-frame" src="about:blank"></iframe>
+    </div>
+    
+    <script>
+        const urlInput = document.getElementById('url-input');
+        const websiteFrame = document.getElementById('website-frame');
+        const errorMessage = document.getElementById('error-message');
+        
+        function formatUrl(url) {
+            url = url.trim().toLowerCase();
+            
+            // Remove any http:// or https:// if present
+            url = url.replace(/^https?:\/\//, '');
+            
+            // Add https:// prefix
+            url = 'https://' + url;
+            
+            // Add .com if no domain extension exists
+            if (!url.match(/\.\w{2,}/)) {
+                url += '.com';
+            }
+            
+            return url;
+        }
+        
+        function loadWebsite(url) {
+            errorMessage.style.display = 'none';
+            
+            try {
+                const formattedUrl = formatUrl(url);
+                new URL(formattedUrl); // Validate URL
+                websiteFrame.src = formattedUrl;
+                
+                // Handle iframe errors
+                websiteFrame.onerror = () => {
+                    errorMessage.textContent = "This website cannot be displayed (blocked by site owner)";
+                    errorMessage.style.display = 'block';
+                };
+                
+            } catch (error) {
+                errorMessage.textContent = "Please enter a valid URL (e.g., google.com or example.org)";
+                errorMessage.style.display = 'block';
+                websiteFrame.src = 'about:blank';
+            }
+        }
+        
+        // Load URL when Enter key is pressed
+        urlInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const url = urlInput.value.trim();
+                if (url) {
+                    loadWebsite(url);
+                }
+            }
+        });
+        
+        // Focus the input field on page load
+        window.addEventListener('load', () => {
+            urlInput.focus();
+        });
+    </script>
+</body>
+</html>

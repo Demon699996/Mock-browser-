@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Search engine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #232323;
+            padding: 0px;
+            text-align: center;
+        }
+        
+        .search-container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .search-bar {
+            position: relative;
+        }
+        
+        .search-input {
+            
+            width: 100%;
+            padding: 10px 45px 10px 45px;
+            border: 1px solid #3B3B3B;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            background-color: #3B3B3B;
+            color: rgba(177, 174, 174, 1);
+            font-weight: 500;
+            caret-color: rgba(200, 200, 200, 1);
+        }
+        
+        .search-input:focus {
+            border-color: #3a3f46;
+            box-shadow: 0 0 9px rgba(109, 109, 109, 1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            z-index: 2;
+        }
+        
+        .search-icon1{
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            z-index: 2;
+        }
+        
+        .suggestions-container {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #3B3B3B;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            border: 1px solid #4a4f56;
+            border-top: none;
+        }
+        
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            color: #d7d7d7;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #4a4f56;
+        }
+        
+        .suggestion-item i {
+            margin-right: 12px;
+            color: #777;
+        }
+        
+        .suggestion-text {
+            flex: 1;
+        }
+        
+        .suggestion-title {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .suggestion-url {
+            font-size: 12px;
+            color: #b9bbbe;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .loading-indicator {
+            padding: 12px 20px;
+            color: #b9bbbe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-indicator i {
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .no-results {
+            padding: 12px 20px;
+            color: #b9bbbe;
+            text-align: center;
+        }
+        
+        h1{
+          color: rgba(148, 148, 148, 1);
+          text-align: center;
+          font-size: 50px;
+        }
+        small{
+            color: rgba(148, 148, 148, 1);
+            text-align: center;
+        }
+        a{
+            color: #C1C1C1;
+            text-decoration: none;
+        }
+        
+        .header{
+            text-align: left;
+            color: rgba(148, 148, 148, 1);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+        }
+        
+        .main-icon{
+            font-size: 22px;
+            left: 10px;
+        }
+        .main-btn{
+            color: rgba(148, 148, 148, 1);
+            border: none;
+            border-radius: 4px;
+            background-color: #3B3B3B;
+            margin-left: 320px;
+        }
+        
+        @media (min-width: 980px){
+          .main-btn {
+             color: rgba(148, 148, 148, 1);
+             border: none;
+             border-radius: 4px;
+             background-color: #3B3B3B;
+             margin-left: 900px;
+          }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header">
+            <i class=" main-icon fa-brands fa-wirsindhandwerk"></i>
+            <button class="main-btn">
+                PRO
+            </button>
+        </div>
+    </header>
+  <h1>MOCK</h1>
+    <div class="search-container">
+        <div class="search-bar">
+            <i class="search-icon fas fa-search"></i>
+            <input type="text" class="search-input" placeholder="Powered by Mock" id="searchInput">
+            <i class=" search-icon1 fa-brands fa-wirsindhandwerk"></i>
+            <div class="suggestions-container" id="suggestionsContainer"></div>
+        </div>
+    </div>
+    <div style="margin-top: 20px;">
+<small>
+    Search output through <strong>Google</strong> , search algorithm is powered by <strong>Mock</strong>
+</small><br>
+<small>
+    By searching in our <strong>Engine</strong> you will accept our <strong><a href="#">terms & conditions.</a></strong>
+</small>
+</div>
+    <script>
+        // Replace with your actual Google Custom Search API key and CX
+        const API_KEY = 'AIzaSyAVOlMD3euH9DEMlI4Ai3KeumTh8Y-Hh1E';
+        const CX = 'e3887eee5232b45de';
+        
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsContainer = document.getElementById('suggestionsContainer');
+        
+        let debounceTimer;
+        
+        // Function to fetch search suggestions from Google Custom Search API
+        async function fetchSuggestions(query) {
+            if (!query || query.trim() === '') {
+                return [];
+            }
+            
+            try {
+                const response = await fetch(`https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CX}&q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.items && data.items.length > 0) {
+                    return data.items.map(item => ({
+                        title: item.title,
+                        url: item.link,
+                        displayUrl: item.displayLink
+                    }));
+                }
+                return [];
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+                return [];
+            }
+        }
+        
+        // Function to display suggestions
+        function displaySuggestions(suggestions) {
+            const container = document.getElementById('suggestionsContainer');
+            container.innerHTML = '';
+            
+            if (suggestions.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.textContent = 'No suggestions found';
+                container.appendChild(noResults);
+            } else {
+                suggestions.forEach(suggestion => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.innerHTML = `
+                        <i class="fas fa-search"></i>
+                        <div class="suggestion-text">
+                            <div class="suggestion-title">${suggestion.title}</div>
+                            <div class="suggestion-url">${suggestion.displayUrl || suggestion.url}</div>
+                        </div>
+                    `;
+                    
+                    item.addEventListener('click', () => {
+                        // Open the suggestion in Google search results
+                        window.open(`https://www.google.com/search?q=${encodeURIComponent(suggestion.title)}`, '_blank');
+                        container.style.display = 'none';
+                    });
+                    
+                    container.appendChild(item);
+                });
+            }
+            
+            container.style.display = 'block';
+        }
+        
+        // Function to show loading indicator
+        function showLoading() {
+            const container = document.getElementById('suggestionsContainer');
+            container.innerHTML = `
+                <div class="loading-indicator">
+                    <i class="fas fa-spinner"></i>
+                    <span>Loading suggestions...</span>
+                </div>
+            `;
+            container.style.display = 'block';
+        }
+        
+        // Event listener for input changes with debounce
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            
+            const query = searchInput.value.trim();
+            
+            if (query.length < 2) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+            
+            showLoading();
+            
+            debounceTimer = setTimeout(async () => {
+                const suggestions = await fetchSuggestions(query);
+                displaySuggestions(suggestions);
+            }, 300);
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-container')) {
+                suggestionsContainer.style.display = 'none';
+            }
+        });
+        
+        // Keyboard navigation
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' && suggestionsContainer.style.display === 'block') {
+                e.preventDefault();
+                const firstSuggestion = suggestionsContainer.querySelector('.suggestion-item');
+                if (firstSuggestion) firstSuggestion.focus();
+            }
+        });
+        
+        suggestionsContainer.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const nextItem = e.target.nextElementSibling;
+                if (nextItem) nextItem.focus();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const prevItem = e.target.previousElementSibling;
+                if (prevItem) {
+                    prevItem.focus();
+                } else {
+                    searchInput.focus();
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                e.target.click();
+            }
+        });
+        
+        // Search when pressing Enter in the input
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
