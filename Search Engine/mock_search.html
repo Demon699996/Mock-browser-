@@ -1,0 +1,428 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mock Search</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+    body {
+      margin: 0;
+      background-color: #121217;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 1.5rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      min-height: 100vh;
+      color: rgba(148, 148, 148, 1);
+    }
+
+    header {
+      width: 100%;
+      max-width: 768px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-text {
+      color: rgba(148, 148, 148, 1);
+      font-weight: 700;
+      font-size: 1.5rem;
+      user-select: none;
+      margin: 0;
+    }
+
+    form {
+      width: 100%;
+      position: relative;
+    }
+
+    input[type="search"] {
+      width: 100%;
+      background-color: #1E1E25;
+      border-radius: 0.6rem;
+      padding: 1rem 1.5rem;
+      font-size: 1.125rem;
+      color: rgba(148, 148, 148, 1);
+      border: none;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    input[type="search"]::placeholder {
+      color: #2E2E37;
+    }
+
+    .search-results {
+      width: 100%;
+      max-width: 768px;
+      display: none;
+    }
+
+    .result-item {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      background-color: #1E1E25;
+    }
+
+    .result-title {
+      color: #8ab4f8;
+      font-size: 1.2rem;
+      margin-bottom: 0.25rem;
+      text-decoration: none;
+      display: block;
+      font-weight: 500;
+    }
+
+    .result-title:hover {
+      text-decoration: underline;
+    }
+
+    .result-url {
+      color: #34a853;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .result-snippet {
+      color: rgba(148, 148, 148, 0.9);
+      font-size: 0.9375rem;
+      line-height: 1.5;
+    }
+
+    .ai-response {
+      background-color: #1E1E25;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-left: 4px solid #4285f4;
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .ai-icon {
+      color: #4285f4;
+      font-size: 1.5rem;
+    }
+
+    .ai-title {
+      color: #8ab4f8;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .ai-content {
+      color: rgba(148, 148, 148, 0.9);
+      line-height: 1.6;
+    }
+
+    .ai-content p {
+      margin-bottom: 1rem;
+    }
+
+    .search-info {
+      color: rgba(148, 148, 148, 0.8);
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+    }
+
+    .no-results {
+      color: rgba(148, 148, 148, 0.8);
+      text-align: center;
+      margin-top: 2rem;
+      padding: 2rem;
+      background-color: #1E1E25;
+      border-radius: 0.5rem;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(148, 148, 148, 0.3);
+      border-radius: 50%;
+      border-top-color: rgba(148, 148, 148, 1);
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+      .logo-text {
+        font-size: 1.25rem;
+      }
+      input[type="search"] {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+      }
+    }
+    i {
+      color: rgba(148, 148, 148, 1);
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <i class="fa-brands fa-wirsindhandwerk"></i>
+      <h1 class="logo-text">Mock</h1>
+    </div>
+    <form id="searchForm">
+      <input type="search" id="searchInput" placeholder="Search the web without being tracked" aria-label="Search the web without being tracked" autocomplete="off" />
+    </form>
+  </header>
+
+  <main class="search-results" id="searchResults">
+    <div id="aiResponseContainer"></div>
+    <div class="search-info" id="searchInfo"></div>
+    <div id="resultsContainer"></div>
+  </main>
+
+  <script>
+    // Configuration - Replace these with your actual API keys
+    const API_CONFIG = {
+      gemini: {
+        apiKey: 'AIzaSyAbgbqmDBF7S7AQV0oV2OR7gtvGU1OciR0', // Replace with your actual Gemini API key
+        endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
+      },
+      google: {
+        apiKey: 'AIzaSyAVOlMD3euH9DEMlI4Ai3KeumTh8Y-Hh1E', // Replace with your actual Google API key
+        cx: 'e3887eee5232b45de',         // Replace with your Custom Search Engine ID
+        endpoint: 'https://www.googleapis.com/customsearch/v1'
+      }
+    };
+
+    document.getElementById('searchForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const query = document.getElementById('searchInput').value.trim();
+      if (query) {
+        await performSearch(query);
+      }
+    });
+
+    async function performSearch(query) {
+      try {
+        // Show loading state
+        document.getElementById('searchResults').style.display = 'block';
+        showLoadingState();
+        
+        // Execute both searches in parallel
+        const [aiResponse, searchResults] = await Promise.allSettled([
+          getAIResponse(query),
+          getWebSearchResults(query)
+        ]);
+        
+        // Process responses
+        handleAIResponse(aiResponse, query);
+        handleWebSearchResults(searchResults, query);
+        
+      } catch (error) {
+        console.error('Search error:', error);
+        showErrorState(error.message);
+      }
+    }
+
+    function showLoadingState() {
+      document.getElementById('aiResponseContainer').innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; padding: 2rem;">
+          <div class="loading"></div>
+          <span>Generating AI response...</span>
+        </div>
+      `;
+      document.getElementById('resultsContainer').innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; padding: 2rem;">
+          <div class="loading"></div>
+          <span>Searching the web...</span>
+        </div>
+      `;
+    }
+
+    function showErrorState(message) {
+      document.getElementById('aiResponseContainer').innerHTML = `
+        <div class="no-results">
+          <p>Error: ${message || 'Failed to load results'}</p>
+        </div>
+      `;
+      document.getElementById('resultsContainer').innerHTML = `
+        <div class="no-results">
+          <p>Error: ${message || 'Failed to load results'}</p>
+        </div>
+      `;
+    }
+
+    async function getAIResponse(query) {
+      try {
+        const url = `${API_CONFIG.gemini.endpoint}?key=${API_CONFIG.gemini.apiKey}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: query }]
+            }],
+            safetySettings: [
+              {
+                category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                threshold: "BLOCK_ONLY_HIGH"
+              }
+            ],
+            generationConfig: {
+              temperature: 0.9,
+              topP: 1,
+              topK: 1,
+              maxOutputTokens: 2048
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error?.message || 'AI request failed');
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error('AI Error:', error);
+        throw error;
+      }
+    }
+
+    async function getWebSearchResults(query) {
+      try {
+        const url = `${API_CONFIG.google.endpoint}?q=${encodeURIComponent(query)}&key=${API_CONFIG.google.apiKey}&cx=${API_CONFIG.google.cx}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error?.message || 'Search request failed');
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error('Search Error:', error);
+        throw error;
+      }
+    }
+
+    function handleAIResponse(response, query) {
+      const container = document.getElementById('aiResponseContainer');
+      
+      if (response.status === 'rejected') {
+        container.innerHTML = `
+          <div class="no-results">
+            <p>AI service unavailable: ${response.reason.message}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const data = response.value;
+      
+      if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        container.innerHTML = `
+          <div class="no-results">
+            <p>No AI response available for "${query}"</p>
+          </div>
+        `;
+        return;
+      }
+
+      const aiText = data.candidates[0].content.parts[0].text;
+      
+      container.innerHTML = `
+        <div class="ai-response">
+          <div class="ai-header">
+            <i class="fas fa-robot ai-icon"></i>
+            <h3 class="ai-title">Mock AI</h3>
+          </div>
+          <div class="ai-content">
+            ${formatAIText(aiText)}
+          </div>
+        </div>
+      `;
+    }
+
+    function handleWebSearchResults(response, query) {
+      const container = document.getElementById('resultsContainer');
+      const infoContainer = document.getElementById('searchInfo');
+      
+      if (response.status === 'rejected') {
+        container.innerHTML = `
+          <div class="no-results">
+            <p>Search service unavailable: ${response.reason.message}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const data = response.value;
+      
+      if (!data?.items?.length) {
+        container.innerHTML = `
+          <div class="no-results">
+            <p>No web results found for "${query}"</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Show search info
+      const totalResults = data.searchInformation?.formattedTotalResults || data.items.length;
+      infoContainer.textContent = `About ${totalResults} web results`;
+      
+      // Display results
+      container.innerHTML = data.items.map(item => {
+        const url = new URL(item.link);
+        const displayUrl = url.hostname.replace('www.', '') + url.pathname.replace(/\/$/, '');
+        
+        return `
+          <div class="result-item">
+            <a href="${item.link}" class="result-title" target="_blank" rel="noopener noreferrer">${item.title}</a>
+            <span class="result-url">${displayUrl}</span>
+            <p class="result-snippet">${item.snippet || ''}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function formatAIText(text) {
+      // Basic formatting for AI response
+      const formattedText = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')             // Italic
+        .replace(/\n\n/g, '</p><p>')                      // Paragraphs
+        .replace(/\n/g, '<br>')                           // Line breaks
+        .replace(/^/, '<p>')                              // Opening paragraph
+        .replace(/$/, '</p>');                            // Closing paragraph
+      
+      // Additional safety check
+      return formattedText.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    }
+  </script>
+</body>
+</html>
